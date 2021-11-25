@@ -1,0 +1,130 @@
+#cloud-config
+
+# This is the user-data configuration file for cloud-init. By default this sets
+# up an initial user called "ubuntu" with password "ubuntu", which must be
+# changed at first login. However, many additional actions can be initiated on
+# first boot from this file. The cloud-init documentation has more details:\  bvmmb h
+# Please note that the YAML format employed by this file is sensitive to
+# differences in whitespace; if you are editing this file in an editor (like
+# Notepad) which uses literal tabs, take care to only use spaces for
+# indentation. See the following link for more details:
+#
+# https://en.wikipedia.org/wiki/YAML
+#
+# Some additional examples are provided in comments below the default
+# configuration.
+
+# On first boot, set the (default) ubuntu user's password to "ubuntu" and
+# expire user passwords
+chpasswd:
+  expire: true
+  list:
+  - ubuntu:ubuntu
+  - jessenich:jessenich
+
+# Enable password authentication with the SSH daemon
+ssh_pwauth: true
+
+## On first boot, use ssh-import-id to give the specific users SSH access to
+## the default user
+ssh_import_id: jessenich
+
+
+## Add users and groups to the system, and import keys with the ssh-import-id
+## utility
+groups:
+- docker: [jessenich]
+- sudo: [jessenich]
+- jessenich: [jessenich]
+
+users:
+- default
+- name: jessenich
+  gecos: Jesse N.
+  primary_group: jessenich
+  groups: users, admin, sudo, docker
+  sudo: 'ALL=(ALL) NOPASSWD: ALL'
+
+## Update apt database and upgrade packages on first boot
+package_update: true
+package_upgrade: true
+
+## Install additional packages on first boot
+packages:
+- apt-transport-https
+- ca-certificates
+- curl
+- git-all
+- git-extras
+- gitweb
+- gradle
+- gradle-apt-plugin
+- gradle-completion
+- gradle-doc
+- jq
+- lighttpd
+- lazygit
+- lazydocker
+- openvpn
+- mosh
+- nginx-doc
+- nginx-full
+- nginx-extras
+- pwgen
+- pastebinit
+- raspi-config
+- rclone
+- rsync
+- rsyslog
+- shellcheck
+- software-properties-common
+- sqlite3
+- ssh
+- sudo
+- ufw
+- unzip
+- wpasupplicant
+- wget
+- wget2
+- whois
+- wput
+- wl-clipboard
+- xclip
+- ytree
+- xml2
+- zip
+- zsh
+- zsh-doc
+
+## Write arbitrary files to the file-system (including binaries!)
+#write_files:
+#- path: /etc/default/keyboard
+#  content: |
+#    # KEYBOARD configuration file
+#    # Consult the keyboard(5) manual page.
+#    XKBMODEL="pc105"
+#    XKBLAYOUT="gb"
+#    XKBVARIANT=""
+#    XKBOPTIONS="ctrl: nocaps"
+#  permissions: '0644'
+#  owner: root:root
+#- encoding: gzip
+#  path: /usr/bin/hello
+#  content: !!binary |
+#    H4sIAIDb/U8C/1NW1E/KzNMvzuBKTc7IV8hIzcnJVyjPL8pJ4QIA6N+MVxsAAAA=
+#  owner: root:root
+#  permissions: '0755'
+
+## Run arbitrary commands at rc.local like time
+runcmd:
+- [ sudo apt-get update, sudo apt-get install -y zsh zsh-doc, chsh --shell /usr/bin/zsh ]
+- [ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)",
+    eval "$(homebrew/bin/brew shellenv)",
+    echo 'eval "$(homebrew/bin/brew shellenv)" >> "$HOME/.bashrc",
+    echo 'eval "$(homebrew/bin/brew shellenv)" >> "$HOME/zshrc",
+    brew install gcc" ]
+- [ wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb,
+    sudo dpkg -i packages-microsoft-prod.deb",
+    sudo apt-get update",
+    sudo apt-get install -y dotnet-sdk-6.0" ]
+-
